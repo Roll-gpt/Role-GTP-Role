@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role GPT - Test Build</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 기본 다크 테마 CSS 변수 */
+        :root {
+            --background: #0a0a0a;
+            --foreground: #ffffff;
+            --card: #0a0a0a;
+            --card-foreground: #ffffff;
+            --primary: #ffffff;
+            --primary-foreground: #0a0a0a;
+            --secondary: #1a1a1a;
+            --secondary-foreground: #ffffff;
+            --muted: #1a1a1a;
+            --muted-foreground: #888888;
+            --accent: #1a1a1a;
+            --accent-foreground: #ffffff;
+            --destructive: #d4183d;
+            --destructive-foreground: #ffffff;
+            --border: rgba(255, 255, 255, 0.1);
+            --input: transparent;
+            --input-background: #1a1a1a;
+            --ring: #708090;
+            --radius: 0.625rem;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .bg-background { background-color: var(--background); }
+        .text-foreground { color: var(--foreground); }
+        .bg-card { background-color: var(--card); }
+        .text-card-foreground { color: var(--card-foreground); }
+        .bg-primary { background-color: var(--primary); }
+        .text-primary-foreground { color: var(--primary-foreground); }
+        .bg-secondary { background-color: var(--secondary); }
+        .text-secondary-foreground { color: var(--secondary-foreground); }
+        .bg-muted { background-color: var(--muted); }
+        .text-muted-foreground { color: var(--muted-foreground); }
+        .bg-accent { background-color: var(--accent); }
+        .text-accent-foreground { color: var(--accent-foreground); }
+        .bg-destructive { background-color: var(--destructive); }
+        .text-destructive-foreground { color: var(--destructive-foreground); }
+        .border-border { border-color: var(--border); }
+        
+        .rounded-xl { border-radius: calc(var(--radius) + 4px); }
+        .rounded-lg { border-radius: var(--radius); }
+        .rounded-md { border-radius: calc(var(--radius) - 2px); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        // React 컴포넌트들이 여기에 로드됩니다
+        const { useState, useEffect, useContext, createContext } = React;
+        
+        // 기본 AppContext
+        const AppContext = createContext();
+        
+        const useApp = () => {
+            const context = useContext(AppContext);
+            if (!context) {
+                throw new Error('useApp must be used within AppProvider');
+            }
+            return context;
+        };
+        
+        // 기본 상태
+        const initialState = {
+            userSettings: {
+                mode: 'standard' // standard, advanced, expert
+            },
+            roles: [
+                {
+                    id: 'marketing_strategist',
+                    name: '마케팅 전략가',
+                    description: '브랜드 전략과 마케팅 캠페인을 기획하는 전문가입니다.',
+                    category: 'recommended',
+                    prompt: '당신은 마케팅 전략 전문가입니다.',
+                    keywordIds: [],
+                    temperature: 0.7,
+                    maxOutputTokens: 2048,
+                    safetyLevel: 'BLOCK_MEDIUM_AND_ABOVE'
+                },
+                {
+                    id: 'dev_mentor',
+                    name: '개발 멘토',
+                    description: '코딩과 개발 방법론을 가르치는 시니어 개발자입니다.',
+                    category: 'popular',
+                    prompt: '당신은 시니어 개발자입니다.',
+                    keywordIds: [],
+                    temperature: 0.7,
+                    maxOutputTokens: 2048,
+                    safetyLevel: 'BLOCK_MEDIUM_AND_ABOVE'
+                }
+            ],
+            conversations: [],
+            activeChatId: null,
+            selectedRoleId: null
+        };
+        
+        // AppProvider 컴포넌트
+        const AppProvider = ({ children }) => {
+            const [state, setState] = useState(initialState);
+            
+            const updateSettings = (newSettings) => {
+                setState(prev => ({
+                    ...prev,
+                    userSettings: { ...prev.userSettings, ...newSettings }
+                }));
+            };
+            
+            const setSelectedRole = (roleId) => {
+                setState(prev => ({ ...prev, selectedRoleId: roleId }));
+            };
+            
+            const value = {
+                state,
+                updateSettings,
+                setSelectedRole,
+                updateConversation: () => {},
+                updateConversation: () => {}
+            };
+            
+            return React.createElement(AppContext.Provider, { value }, children);
+        };
+        
+        // 로드할 컴포넌트 파일들 목록
+        const componentFiles = [
+            './components/ui/Button.js',
+            './components/ui/Card.js', 
+            './components/ui/Badge.js',
+            './components/WelcomeCard.js',
+            './components/ConversationSettingsModal.js',
+            './TestApp.js'
+        ];
+        
+        // 컴포넌트 파일들을 순차적으로 로드
+        Promise.all(componentFiles.map(file => 
+            fetch(file).then(res => res.text()).then(code => {
+                const script = document.createElement('script');
+                script.type = 'text/babel';
+                script.text = code;
+                document.head.appendChild(script);
+            })
+        )).then(() => {
+            // 모든 컴포넌트가 로드된 후 앱 렌더링
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(React.createElement(AppProvider, null, React.createElement(TestApp)));
+        }).catch(error => {
+            console.error('Component loading error:', error);
+            // 로드 실패시 간단한 에러 메시지 표시
+            document.getElementById('root').innerHTML = `
+                <div style="padding: 20px; text-align: center;">
+                    <h1>Role GPT 테스트</h1>
+                    <p>컴포넌트 로딩 중 오류가 발생했습니다.</p>
+                    <p style="color: #888; font-size: 14px;">Google AI Studio 연결 테스트용</p>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>
