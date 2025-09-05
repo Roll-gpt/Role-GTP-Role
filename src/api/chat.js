@@ -75,7 +75,7 @@ export default async function handler(req, res) {
     ];
     
     const resultStream = await ai.models.generateContentStream({
-        model: 'gemini-2.5-flash',
+        model: 'gemma-3-27b-it',
         contents: contents,
         config: {
             systemInstruction: systemInstruction,
