@@ -74,9 +74,9 @@ export default async function handler(req, res) {
         { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
     ];
     
-    console.log('Starting generateContentStream with model: gemini-2.5-flash');
+    console.log('Starting generateContentStream with model: gemma-3-27b-it');
     const resultStream = await ai.models.generateContentStream({
-        model: 'gemini-2.5-flash',
+        model: 'gemma-3-27b-it',
         contents: contents,
         config: {
             systemInstruction: systemInstruction,
