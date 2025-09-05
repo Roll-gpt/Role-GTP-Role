@@ -109,7 +109,7 @@ export async function* streamTrialMessage(
     const project = activeChat?.projectId ? state.projects.find(p => p.id === activeChat.projectId) : null;
     
     try {
-        const response = await fetch('/api/chat', {
+        const response = await fetch('https://role-gtp-role.onrender.com/api/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
