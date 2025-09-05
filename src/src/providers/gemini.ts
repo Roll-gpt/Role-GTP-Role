@@ -72,7 +72,7 @@ export async function* streamGeminiMessage(
         ];
         
         const request: GenerateContentParameters = {
-            model: apiConfig.modelName || 'gemini-2.5-flash',
+            model: apiConfig.modelName || 'gemma-3-27b-it',
             contents: contents,
             config: {
                 systemInstruction: systemInstruction,
